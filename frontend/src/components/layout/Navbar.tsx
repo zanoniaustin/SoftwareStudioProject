@@ -32,12 +32,12 @@ export function Navbar() {
                         </>
                     ) : (
                         <>
-                            <Link href="/auth/login"
+                            <Link href="/login"
                                   className="text-sm font-medium text-text-secondary transition-colors hover:text-text-primary">
                                 Login
                             </Link>
                             <Button asChild size="sm">
-                                <Link href="/auth/register">Register</Link>
+                                <Link href="/register">Register</Link>
                             </Button>
                         </>
                     )}
