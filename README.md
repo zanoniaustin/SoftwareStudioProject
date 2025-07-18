@@ -77,7 +77,7 @@ All commands should be run from the **root `pokehub` directory**.
 * **To run both the frontend and backend simultaneously:**
 
   ```bash
-  npx nx run-many --target=serve --projects=@pokehub/web,api
+  npx nx run-many --target=serve-static --projects=@pokehub/web,api
   ```
 
     * Frontend will be available at `http://localhost:3000`.
@@ -86,11 +86,11 @@ All commands should be run from the **root `pokehub` directory**.
 * **To run only the frontend:**
 
   ```bash
-  npx nx serve @pokehub/web
+  npx nx serve-static @pokehub/web
   ```
 
 * **To run only the backend:**
 
   ```bash
-  npx nx serve api
+  npx nx serve-static api
   ```
