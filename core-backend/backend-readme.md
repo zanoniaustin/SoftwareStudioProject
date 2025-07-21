@@ -43,47 +43,6 @@ To run the notebook make sure you are in the sub-directory `notebook` and run `j
 ----------------------------------------------------------------------------------------------------------------------------------------------
 
 
-## How to Run Notebook
-  1. Install Dependencies
-         Review and use the provided requirements.txt.
-
-  2. Directory Structure to Update
-
-         Check/Update Paths:
-
-            Ensure these directories exist and are correctly referenced in the notebook:
-            Base Directory->model,label,data
-            Parent Directory->images,Data,ALL_Pokemon_Cards,ALL_Pokemon_Cards_standard
-
-   3. Required Datasets
-         Image Dataset: Folder containing Pokemon card images (must be placed in Data directory).
-         Metadata CSV: File pokemon-tcg-data-master 1999-2023.csv (must be placed in Data directory).
-
-   4. Testing via Image Upload
-         Upload or select an image.
-         Use the same preprocessing (resize, normalize).
-         Predict card with the saved model.
-         Lookup card details in metadata.
-
-## Directory Structure
-
-## High-Level Steps
-   Image Preprocessing:
-      -Remove duplicates, check for corrupt files.
-      -Convert images to RGB, resize to 224x224, save as JPEG.
-   Build manifest CSV linking image paths and metadata (id, set, etc).
-
-   Merge Datasets:Merge image manifest with pokemon-tcg-data-master 1999-2023.csv on id.
-
-   Label Mapping:Assign each unique card id an integer label (id2idx, idx2id).
-
-   Dataset & Dataloader:All images used for training (no split).
-
-   Apply strong data augmentation in transforms.
-
-   Model Training:
-      -Use a pre-trained ResNet (replace final layer with num_classes).
-      - Train on all images, save model as .pth.
 
 ## How to Start Python backend application API and Invoke URL
 
@@ -158,6 +117,50 @@ Edit
 This model is trained using images from the pokemon-cards.csv dataset, with a total of 13,088 images.The reported Training Set Accuracy is 0.9362.Model training time around ~2 hours 15 minutes.
 Important: This model is currently optimized for clean, high-quality images similar to those in the training dataset.It may not correctly identify real-world photos of Pokémon cards taken with a phone or under different lighting, backgrounds, or angles. For best results on real-world uploads, additional training on such photos is recommended.
 
+
+## How to Run Notebook
+  1. Install Dependencies
+         Review and use the provided requirements.txt.
+
+  2. Directory Structure to Update
+
+         Check/Update Paths:
+
+            Ensure these directories exist and are correctly referenced in the notebook:
+            Base Directory->model,label,data
+            Parent Directory->images,Data,ALL_Pokemon_Cards,ALL_Pokemon_Cards_standard
+
+   3. Required Datasets
+         Image Dataset: Folder containing Pokemon card images (must be placed in Data directory).
+         Metadata CSV: File pokemon-tcg-data-master 1999-2023.csv (must be placed in Data directory).
+
+   4. Testing via Image Upload
+         Upload or select an image.
+         Use the same preprocessing (resize, normalize).
+         Predict card with the saved model.
+         Lookup card details in metadata.
+
+## Directory Structure
+
+## High-Level Steps
+   Image Preprocessing:
+      -Remove duplicates, check for corrupt files.
+      -Convert images to RGB, resize to 224x224, save as JPEG.
+   Build manifest CSV linking image paths and metadata (id, set, etc).
+
+   Merge Datasets:Merge image manifest with pokemon-tcg-data-master 1999-2023.csv on id.
+
+   Label Mapping:Assign each unique card id an integer label (id2idx, idx2id).
+
+   Dataset & Dataloader:All images used for training (no split).
+
+   Apply strong data augmentation in transforms.
+
+   Model Training:
+      -Use a pre-trained ResNet (replace final layer with num_classes).
+      - Train on all images, save model as .pth.
+
+      
 ## Credits / Data Sources
 
 - **Pokémon TCG Card Images Dataset**
@@ -174,3 +177,4 @@ All data and images used for model training, testing, and inference in this proj
 Please refer to the linked Kaggle pages for licensing and usage restrictions.
 
 ----------------------------------------------------------------------------------------------------------------------------------------------
+
