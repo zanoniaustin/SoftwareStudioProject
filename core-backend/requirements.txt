@@ -3,3 +3,10 @@ numpy
 pandas
 scikit-learn
 matplotlib
+seaborn
+fastapi              # <--- Required for API
+uvicorn              # <--- Required for serving FastAPI
+torch                # <--- Required for PyTorch model
+torchvision          # <--- Required for ResNet/image transforms
+pillow               # <--- Required for image loading
+python-multipart     # <--- Required for FastAPI file uploads
