@@ -60,7 +60,7 @@ To run the notebook make sure you are in the sub-directory `notebook` and run `j
 │   └── main.py
 │
 ├── data/
-│   └── pokemon-manifest-file.csv       # Store the main dataset here
+│   └── ALL_Pokemon_Cards_manifest_with_base64.csv       # Store the main dataset here
 │
 ├── notebook/
 │   └── core-backend-notebook.ipynb
