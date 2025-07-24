@@ -18,7 +18,7 @@ developers using a JetBrains IDE like WebStorm.
 Before you begin, ensure you have the following installed on your system:
 
 * **Node.js** (v18 or later)
-* **Python** (v3.9 or later)
+* **Python** (>=3.9,<3.11)
 * **Poetry**
 * **WebStorm**, **PyCharm Pro**, or **IntelliJ Ultimate** (with the Python plugin enabled)
 
