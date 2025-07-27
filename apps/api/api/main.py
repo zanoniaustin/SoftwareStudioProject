@@ -86,11 +86,13 @@ def extract_card_details(image):
     return card_name, set_name
 
 def get_price_from_ebay_sold(card_name, set_name=None, rarity=None):
+ 
     invalid_names = {'your', 'pokemon', 'card', 'the', 'a', 'an'}
+    
     if not card_name or not any(c.isalnum() for c in card_name) or card_name.lower() in invalid_names:
         return "Invalid card name"
 
-
+    
     query_parts = [card_name]
     if set_name:
         query_parts.append(set_name)
@@ -114,17 +116,17 @@ def get_price_from_ebay_sold(card_name, set_name=None, rarity=None):
             'Connection': 'keep-alive',
             'DNT': '1',
         }
-
+  
         time.sleep(2)
         response = requests.get(url, headers=headers, timeout=10)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, 'html.parser')
 
-
+      
         sold_prices = soup.select('.s-item__price')
         if sold_prices:
             prices = []
-            for price in sold_prices[:5]:
+            for price in sold_prices[:5]:  # Limit to 5 recent sales
                 price_text = price.text.strip()
                 if price_text.startswith('$'):
                     try:
@@ -134,7 +136,7 @@ def get_price_from_ebay_sold(card_name, set_name=None, rarity=None):
                         continue
             if prices:
                 avg_price = sum(prices) / len(prices)
-                return f"${avg_price:.2f}" 
+                return f"${avg_price:.2f}"  
 
         return "Price not found"
 
@@ -157,6 +159,11 @@ async def identify_card_api(file: UploadFile = File(...)):
         if not card_id or card_id not in manifest_df.index:
             return JSONResponse(content={"error": "Card not found"}, status_code=404)
         card_row = manifest_df.loc[card_id]
+        price = get_price_from_ebay_sold(
+            card_row.get("name", ""),
+            card_row.get("set", ""),
+            card_row.get("rarity", "")
+        )
         result = {
             "id": card_id,
             "name": card_row.get("name", ""),
@@ -165,15 +172,18 @@ async def identify_card_api(file: UploadFile = File(...)):
             "rarity": card_row.get("rarity", ""),
             "types": card_row.get("types", ""),
             "official_card_image_url": card_row.get("official_card_image_url", ""),
-            "base64_image": card_row.get("base64_image", "")
+            "base64_image": card_row.get("base64_image", ""),
+            "price": price
         }
         if isinstance(result["types"], str) and result["types"].startswith("["):
             try:
                 result["types"] = ast.literal_eval(result["types"])
             except Exception:
                 pass
+       
         result["ocr_card_name"] = result["name"]
         result["ocr_set_name"] = result["set"]
+ 
         result["price"] = get_price_from_ebay_sold(result["name"], result["set"], result["rarity"])
         return JSONResponse(content=result)
     except Exception as e:
