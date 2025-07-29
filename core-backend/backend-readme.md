@@ -1,107 +1,128 @@
 # SoftwareStudioProject - Backend
 
-Follow these steps to set up your environment for backend development.
+This document describes how to set up, run, and use the backend for the Pokémon Card Identification project.
+
+---
 
 ## Requirements
 
 - Python `3.10` or `3.11`
 - Conda (Miniconda or Anaconda) installed
 
-### Setup Instructions (macOS & Windows)
+---
+
+## Environment Setup (macOS & Windows)
 
 1. Download and install Miniconda or Anaconda from the official website.
 2. Open your terminal and run:
-
-   ```
+   ```sh
    conda create -n software-studio python=3.10 -y
    conda activate software-studio
    pip install -r requirements.txt
    ```
-
    > Make sure you are in the same directory as this README and the `requirements.txt` file before running the install command.
 
-## Goals
+---
 
-1. Train on the Pokemon TCG Dataset of thier images in a Jupyter notebook first.
-   - Make sure the cards are all from a single release. This will give us a smaller set of data to train and work things out.
-   - When training divide the cards into 70 train, 15 validation, 15 test.
-2. Save the train model somewhere. Maybe a database or container.
-3. Test and verify its accuracy. 
+## Project Goals
 
-## Jupyter Notebook
+1. Train on the Pokémon TCG Dataset of card images in a Jupyter notebook.
+   - Start with cards from a single release for a manageable dataset.
+   - Split data: 70% train, 15% validation, 15% test.
+2. Save the trained model (e.g., to a database or container).
+3. Test and verify model accuracy.
 
-For brainstorming and training lets use a jupyter notebook then write our process in `main.py`.
+---
 
-To run the notebook make sure you are in the sub-directory `notebook` and run `jupyter-notebook .` then open the notebook **core-backend-notebook.ipynb`
+## Jupyter Notebook Usage
 
-## Notes
+- Use the notebook for brainstorming and model training.
+- Document your process in `main.py` after experimentation.
+- To run the notebook:
+  ```sh
+  cd notebook
+  jupyter-notebook .
+  ```
+  Open `core-backend-notebook.ipynb` in your browser.
 
-- Add any required libraries to the `requirements.txt` file.
-- Update this README with additional setup or run instructions as needed.
-
-
-----------------------------------------------------------------------------------------------------------------------------------------------
-
-
-
-## How to Start Python backend application API and Invoke URL
+---
 
 ## Directory Structure
-   model/pokemon_card_model.pth – Trained model weights
-   label/idx2id.json – Label mapping file
-   data/ALL_Pokemon_Cards_manifest_with_base64.csv – Metadata and base64-encoded card images
-   main.py – Main FastAPI application
 
-   backend/
+```
+core-backend/
 │
 ├── README.md
 ├── requirements.txt
-├── app
+│
+├── app/
 │   └── main.py
 │
 ├── data/
-│   └── ALL_Pokemon_Cards_manifest_with_base64.csv       # Store the main dataset here
+│   └── ALL_Pokemon_Cards_manifest_with_base64.csv   # Main dataset
 │
 ├── notebook/
 │   └── core-backend-notebook.ipynb
 │
 ├── model/
-│   └── pokemon_card_model.pth     # Trained model artifacts
+│   └── pokemon_card_model.pth                       # Trained model artifacts
 │
 └── label/
-    └── idx2id.json                # Label mapping file
+    └── idx2id.json                                  # Label mapping file
+```
 
+---
 
-## How to Start the Python App
-   1. Install Dependencies
-         Use Poetry (recommended) or pip install -r requirements.txt.
+## How to Start the Python Backend API
 
-         Ensure all required files are in their respective folders.
+1. **Install Dependencies**
+   - Use [Poetry](https://python-poetry.org/) (recommended):
+     ```sh
+     poetry install
+     ```
+   - Or use pip:
+     ```sh
+     pip install -r requirements.txt
+     ```
+   - Ensure all required files are in their respective folders.
 
-   2. (Optional) Edit Paths
-         If your folder structure is different, edit the BASE_DIR path in main.py to match your project root.
-         BASE_DIR = "/absolute/path/to/core-backend/"
+2. **(Optional) Edit Paths**
+   - If your folder structure is different, update the `BASE_DIR` path in `main.py`:
+     ```python
+     BASE_DIR = "/absolute/path/to/core-backend/"
+     ```
 
-   3. Start the Application
-         With Poetry:
-         poetry run uvicorn main:app --reload
-   
-         Or with pip/venv:
-         uvicorn main:app --reload
+3. **Start the Application**
+   - With Poetry:
+     ```sh
+     poetry run uvicorn main:app --reload
+     ```
+   - Or with pip/venv:
+     ```sh
+     uvicorn main:app --reload
+     ```
 
-   4. Access the API
-         Main API endpoint:http://localhost:8000/identify_card
-         POST an image (field name: file, type: image/jpeg or image/png).
+4. **Access the API**
+   - Main API endpoint:
+     ```
+     http://localhost:8000/identify_card
+     ```
+     - POST an image (field name: `file`, type: `image/jpeg` or `image/png`)
+   - Swagger (interactive docs):
+     ```
+     http://localhost:8000/docs
+     ```
+     - Test endpoints, upload images, view responses.
+   - Redoc (read-only docs):
+     ```
+     http://localhost:8000/redoc
+     ```
 
-         Swagger (interactive docs):http://localhost:8000/docs
-         Test endpoints, upload images, view responses.
+---
 
-         Redoc (read-only docs):http://localhost:8000/redoc
+## API Example Response
 
-API Example Response
-json
-Copy
-Edit
+```json
 {
   "id": "smp-SM125",
   "name": "Naganadel-GX",
@@ -112,55 +133,72 @@ Edit
   "official_card_image_url": "",
   "base64_image": "<long_base64_string>"
 }
+```
 
-## Note:
-This model is trained using images from the pokemon-cards.csv dataset, with a total of 13,088 images.The reported Training Set Accuracy is 0.9362.Model training time around ~2 hours 15 minutes.
-Important: This model is currently optimized for clean, high-quality images similar to those in the training dataset.It may not correctly identify real-world photos of Pokémon cards taken with a phone or under different lighting, backgrounds, or angles. For best results on real-world uploads, additional training on such photos is recommended.
+---
 
+## Model Notes
 
-## How to Run Notebook
-  1. Install Dependencies
-         Review and use the provided requirements.txt.
+- Trained using images from the **pokemon-cards.csv** dataset (13,088 images).
+- Training Set Accuracy: **0.9362**
+- Model training time: ~2 hours 15 minutes.
 
-  2. Directory Structure to Update
+> **Important:**  
+> This model is optimized for clean, high-quality images similar to those in the training dataset.  
+> It may not correctly identify real-world photos of Pokémon cards taken with a phone or under different lighting, backgrounds, or angles.  
+> For best results on real-world uploads, additional training on such photos is recommended.
 
-         Check/Update Paths:
+---
 
-            Ensure these directories exist and are correctly referenced in the notebook:
-            Base Directory->model,label,data
-            Parent Directory->images,Data,ALL_Pokemon_Cards,ALL_Pokemon_Cards_standard
+## How to Run the Jupyter Notebook
 
-   3. Required Datasets
-         Image Dataset: Folder containing Pokemon card images (must be placed in Data directory).
-         Metadata CSV: File pokemon-tcg-data-master 1999-2023.csv (must be placed in Data directory).
+1. **Install Dependencies**
+   ```sh
+   pip install -r requirements.txt
+   ```
 
-   4. Testing via Image Upload
-         Upload or select an image.
-         Use the same preprocessing (resize, normalize).
-         Predict card with the saved model.
-         Lookup card details in metadata.
+2. **Check Directory Structure**
+   - Ensure the following directories exist and are correctly referenced in the notebook:
+     - **Base Directory:** `model/`, `label/`, `data/`
+     - **Parent Directory:** `images/`, `Data/`, `ALL_Pokemon_Cards/`, `ALL_Pokemon_Cards_standard/`
 
-## Directory Structure
+3. **Prepare Required Datasets**
+   - **Image Dataset:** Place the folder containing Pokémon card images in the `Data` directory.
+   - **Metadata CSV:** Place the file `pokemon-tcg-data-master 1999-2023.csv` in the `Data` directory.
+
+4. **Test via Image Upload**
+   - Upload or select an image for testing.
+   - Apply the same preprocessing steps (resize, normalize) as used during training.
+   - Use the saved model to predict the card.
+   - Lookup card details in the metadata for the prediction result.
+
+---
 
 ## High-Level Steps
-   Image Preprocessing:
-      -Remove duplicates, check for corrupt files.
-      -Convert images to RGB, resize to 224x224, save as JPEG.
-   Build manifest CSV linking image paths and metadata (id, set, etc).
 
-   Merge Datasets:Merge image manifest with pokemon-tcg-data-master 1999-2023.csv on id.
+1. **Image Preprocessing**
+   - Remove duplicate and corrupt files.
+   - Convert images to RGB, resize to 224x224 pixels, and save as JPEG.
+   - Build a manifest CSV linking image paths to metadata (id, set, etc.).
 
-   Label Mapping:Assign each unique card id an integer label (id2idx, idx2id).
+2. **Merge Datasets**
+   - Merge the image manifest with `pokemon-tcg-data-master 1999-2023.csv` on the card `id`.
 
-   Dataset & Dataloader:All images used for training (no split).
+3. **Label Mapping**
+   - Assign each unique card id an integer label (`id2idx`, `idx2id`).
 
-   Apply strong data augmentation in transforms.
+4. **Dataset & Dataloader**
+   - Use all images for training (no validation/test split).
 
-   Model Training:
-      -Use a pre-trained ResNet (replace final layer with num_classes).
-      - Train on all images, save model as .pth.
+5. **Data Augmentation**
+   - Apply strong augmentation techniques in the training transforms.
 
-      
+6. **Model Training**
+   - Use a pre-trained ResNet model and replace the final layer with the correct number of classes.
+   - Train on all images and save the model as a `.pth` file.
+
+---
+
 ## Credits / Data Sources
 
 - **Pokémon TCG Card Images Dataset**
@@ -176,5 +214,4 @@ Important: This model is currently optimized for clean, high-quality images simi
 All data and images used for model training, testing, and inference in this project come from the sources listed above.  
 Please refer to the linked Kaggle pages for licensing and usage restrictions.
 
-----------------------------------------------------------------------------------------------------------------------------------------------
-
+---
