@@ -42,21 +42,34 @@ export const logout = async (): Promise<{ success: true }> => {
 
 // --- Card API ---
 export const identifyCard = async (imageFile: File): Promise<PokemonCard> => {
-  console.log('API Call: Identifying card from image:', imageFile.name);
-  await delay(2000); // Simulate ML model processing
-  // Return a random card as the identified result for demonstration
-  return MOCK_CARDS[Math.floor(Math.random() * MOCK_CARDS.length)];
-};
+  // Prepare form data
+  const formData = new FormData();
+  formData.append('file', imageFile);
 
-export const searchDatabase = async (filters: {
-  query: string;
-}): Promise<PokemonCard[]> => {
-  console.log('API Call: Searching database with filters:', filters);
-  await delay(800);
-  if (!filters.query) return MOCK_CARDS;
-  return MOCK_CARDS.filter((card) =>
-    card.name.toLowerCase().includes(filters.query?.toLowerCase() || '')
-  );
+  // Call the FastAPI backend
+  const response = await fetch('http://localhost:8000/identify_card', {
+    method: 'POST',
+    body: formData,
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to identify card');
+  }
+
+  const data = await response.json();
+
+  // Map backend response to your PokemonCard type as needed
+  return {
+    id: data.id,
+    name: data.name,
+    set: {
+      name: data.set,
+      number: '', // Fill if available
+    },
+    rarity: data.rarity,
+    imageUrl: data.official_card_image_url,
+    estimatedPrice: data.price, // This is the EST price from main.py
+  };
 };
 
 // --- Collection API ---
@@ -66,4 +79,17 @@ export const getCollection = async (
   console.log(`API Call: Fetching collection for user: ${userId}`);
   await delay(1200);
   return MOCK_USER_COLLECTION;
+};
+
+export const searchDatabase = async ({
+  query,
+}: {
+  query: string;
+}): Promise<PokemonCard[]> => {
+  // For now, just return all mock cards that match the query in the name
+  await delay(500);
+  if (!query) return MOCK_CARDS;
+  return MOCK_CARDS.filter((card) =>
+    card.name.toLowerCase().includes(query.toLowerCase())
+  );
 };
