@@ -7,7 +7,7 @@
     "serve-static": {
       "executor": "@nxlv/python:run-commands",
       "options": {
-        "command": "poetry run uvicorn api:app --reload",
+        "command": "poetry run uvicorn api:app --reload --app-dir .",
         "cwd": "apps/api"
       }
     },

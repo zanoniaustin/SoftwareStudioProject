@@ -11,13 +11,23 @@ export interface User {
 export interface PokemonCard {
     id: string;
     name: string;
-    imageUrl: string;
     set: {
         name: string;
         number: string;
     };
     rarity: string;
+    imageUrl: string;
     estimatedPrice: number;
+}
+
+// This represents the raw data from the Python API
+export interface BackendCardResponse {
+    id: string;
+    name: string;
+    set: string; // The backend sends 'set' as a string
+    rarity: string;
+    official_card_image_url: string; // The backend sends this key
+    // ... add any other fields the backend sends
 }
 
 /** Represents a card within a user's personal collection. */
