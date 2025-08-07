@@ -1,19 +1,19 @@
 # SoftwareStudioProject
 
-Drexel SE-691-684 - SU 24-25
-Alejandro Rojas
-Austin Zanoni
-Dan Arthur
-Justin Yang
-Rahul Madhusudanan
-Vipin George
+Drexel SE-691-684 - SU 24-25 <br>
+Alejandro Rojas <br>
+Austin Zanoni <br>
+Dan Arthur <br>
+Justin Yang <br>
+Rahul Madhusudanan <br>
+Vipin George <br>
 
 ## Project Setup Guide for `pokehub`
 
 This document provides a complete guide to setting up the `pokehub` monorepo for local development, specifically for
 developers using a JetBrains IDE like WebStorm.
 
-### \#\# Prerequisites
+### Prerequisites
 
 Before you begin, ensure you have the following installed on your system:
 
@@ -22,7 +22,7 @@ Before you begin, ensure you have the following installed on your system:
 * **Poetry**
 * **WebStorm**, **PyCharm Pro**, or **IntelliJ Ultimate** (with the Python plugin enabled)
 
-### \#\# 1. Initial Workspace Setup
+### 1. Initial Workspace Setup
 
 First, clone the repository and install all the necessary Node.js dependencies for the workspace.
 
@@ -32,10 +32,12 @@ cd pokehub
 npm install
 ```
 
-### \#\# 2. Python Backend Setup
+### 2. Python Backend Setup
 
 The Python backend is managed by Poetry. The following one-time configuration is required for a smooth development
 experience.
+
+> **Note**: Deactiviate any other Python virtual envrionements such as `conda` or `venv`.
 
 1. **Configure Poetry for Local Virtual Environments**
    This command tells Poetry to create the `.venv` folder inside your project, which makes it easy for your IDE to find.
@@ -60,7 +62,9 @@ experience.
    cd ../.. 
    ```
 
-### \#\# 3. IDE Configuration (WebStorm)
+###  3. IDE Configuration (WebStorm)
+
+> **Note**: Skip if using VS Code (Visual Studio Code).
 
 You must configure WebStorm to recognize the Python interpreter for the `api` project.
 
@@ -70,7 +74,7 @@ You must configure WebStorm to recognize the Python interpreter for the `api` pr
 4. Click the `...` icon and navigate to the interpreter path: `pokehub/apps/api/.venv/bin/python`.
 5. Click **OK** to apply. The IDE will index the packages.
 
-### \#\# 4. Running the Application
+### 4. Running the Application
 
 All commands should be run from the **root `pokehub` directory**.
 

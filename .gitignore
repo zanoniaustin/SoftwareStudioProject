@@ -48,3 +48,8 @@ Thumbs.db
 out
 
 test-output
+
+# jupyter notebooks
+.ipynb_checkpoints/
+
+

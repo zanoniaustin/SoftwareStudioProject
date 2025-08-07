@@ -36,6 +36,9 @@ torch = "^2.7.1"
 torchvision = "^0.22.1"
 pillow = "^11.3.0"
 python-multipart = "^0.0.20"
+pytesseract = "^0.3.10"
+opencv-python = "^4.9.0"
+beautifulsoup4 = "^4.12.3"
 
 [tool.poetry.group.dev.dependencies]
 autopep8 = "2.3.1"

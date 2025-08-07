@@ -1,0 +1,7 @@
+image:
+  repository: pokehub-frontend
+  tag: latest
+
+ingress:
+  enabled: false
+  host: pokehub.local

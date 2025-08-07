@@ -1,0 +1,14 @@
+apiVersion: v2
+name: pokehub
+description: A Helm chart for deploying PokeHub frontend and backend
+type: application
+version: 0.1.0
+appVersion: "1.0"
+
+dependencies:
+  - name: frontend
+    version: 0.1.0
+    repository: "file://charts/frontend"
+  - name: backend
+    version: 0.1.0
+    repository: "file://charts/backend"

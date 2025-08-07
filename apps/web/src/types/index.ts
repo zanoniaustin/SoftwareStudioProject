@@ -12,12 +12,13 @@ export interface PokemonCard {
     id: string;
     name: string;
     imageUrl: string;
+    base64Image?: string; // Optional: Add Base64 image from backend
     set: {
         name: string;
         number: string;
     };
     rarity: string;
-    estimatedPrice: number;
+    estimatedPrice: string;
 }
 
 /** Represents a card within a user's personal collection. */
