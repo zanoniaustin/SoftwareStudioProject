@@ -13,6 +13,15 @@ export function AuthForm({ formType, onSubmit }: AuthFormProps) {
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isInvalidEmail, setIsInvalidEmail] = useState(false);
+
+  const handleEmailChange = (e) => {
+    const newEmail = e.target.value;
+    setEmail(newEmail);
+
+    const isValid = /\S+@\S+\.\S+/.test(newEmail);
+    setIsInvalidEmail(!isValid && newEmail.length > 0);
+  };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -41,7 +50,7 @@ export function AuthForm({ formType, onSubmit }: AuthFormProps) {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
-            className="mt-1 block w-full rounded-md border-border-color shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+            className="mt-1 block w-full rounded-md border-2 border-gray-400 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
           />
         </div>
       )}
@@ -55,11 +64,12 @@ export function AuthForm({ formType, onSubmit }: AuthFormProps) {
         <input
           id="email"
           type="email"
+          placeholder="email@example.com"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={handleEmailChange}
           required
-          className="mt-1 block w-full rounded-md border-border-color shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
-        />
+          className={`mt-1 block w-full rounded-md border-2 border-gray-400 shadow-sm focus:border-primary focus:ring-primary sm:text-sm
+            ${isInvalidEmail ? 'border-red-500 focus:border-red-500' : 'border-gray-400 focus:border-primary'}  `}/>
       </div>
       <div>
         <label
@@ -74,7 +84,7 @@ export function AuthForm({ formType, onSubmit }: AuthFormProps) {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          className="mt-1 block w-full rounded-md border-border-color shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+          className="mt-1 block w-full rounded-md border-2 border-gray-400 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
         />
       </div>
       <Button type="submit" disabled={loading} className="w-full">
