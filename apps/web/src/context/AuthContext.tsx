@@ -44,7 +44,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
       router.push('/my-pokedex');
     } catch (error) {
       console.error(error);
-      alert('Login Failed: Invalid credentials.');
+      alert(error);
     }
   };
 
@@ -60,7 +60,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
       router.push('/my-pokedex');
     } catch (error) {
       console.error(error);
-      alert('Registration Failed.');
+      alert(error);
     }
   };
 
