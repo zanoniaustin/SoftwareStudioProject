@@ -1,0 +1,54 @@
+# Stage 1: Build stage
+FROM python:3.10-slim AS builder
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libgl1 \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender1 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Poetry
+RUN pip install poetry
+
+# Copy dependency files and install dependencies
+COPY apps/api/pyproject.toml apps/api/poetry.lock ./
+RUN poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi
+
+# Copy application code
+COPY apps/api /app
+
+# Stage 2: Runtime stage
+FROM python:3.10-slim
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgl1 \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender1 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy only the necessary files from the build stage
+COPY --from=builder /app /app
+COPY --from=builder /usr/local /usr/local
+
+# Expose the port the app runs on
+EXPOSE 8000
+
+# Command to run the application
+CMD ["uvicorn", "api.__init__:app", "--host", "0.0.0.0", "--port", "8000"]
