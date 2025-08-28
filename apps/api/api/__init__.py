@@ -186,3 +186,35 @@ async def identify_card_api(file: UploadFile = File(...)):
         return JSONResponse(content=result)
     except Exception as e:
         return JSONResponse(content={"error": f"Server error: {str(e)}"}, status_code=500)
+
+@app.post("/search_cards")
+async def search_cards_api(query: str = ""):
+    try:
+        if not query:
+            results_df = manifest_df.head(20)
+        else:
+            results_df = manifest_df[manifest_df['name'].str.contains(query, case=False, na=False)]
+
+        results = results_df.reset_index().to_dict(orient='records')
+
+        formatted_results = []
+        for card in results:
+            price = "N/A" # No price column in CSV, so we use a placeholder.
+
+            formatted_results.append({
+                "id": card.get("id", ""),
+                "name": card.get("name", ""),
+                # Correctly format 'set' as an object to match frontend type
+                "set": {
+                    "name": card.get("set", ""),
+                    "number": "" # CSV does not contain a card number, so this is empty
+                },
+                "rarity": card.get("rarity", ""),
+                "base64_image": card.get("base64_image", ""), # Use base64 from CSV
+                "price": price
+            })
+
+        return JSONResponse(content=formatted_results)
+
+    except Exception as e:
+        return JSONResponse(content={"error": f"Server error: {str(e)}"}, status_code=500)
