@@ -1,0 +1,36 @@
+# ---------- deps ----------
+FROM node:20-alpine AS deps
+WORKDIR /app
+ENV NX_DAEMON=false
+COPY package*.json ./
+# If you have a lockfile, include it for reproducibility:
+# COPY package-lock.json ./
+RUN npm ci --no-audit --no-fund
+
+# ---------- build ----------
+FROM node:20-alpine AS builder
+WORKDIR /app
+ENV NX_DAEMON=false
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN npx nx build @pokehub/web
+
+# ---------- runtime ----------
+FROM node:20-alpine AS runner
+# We’ll run the app from the repo root but execute Next in the app dir
+WORKDIR /app
+ENV NODE_ENV=production
+# Make the root node_modules binaries visible when we cd into apps/web
+ENV PATH=/app/node_modules/.bin:$PATH
+
+# Built assets and public
+COPY --from=builder /app/apps/web/.next /app/apps/web/.next
+COPY --from=builder /app/apps/web/public /app/apps/web/public
+
+# Root node_modules (hoisted deps; includes "next")
+COPY --from=deps /app/node_modules /app/node_modules
+
+EXPOSE 3000
+# Run Next inside the app directory
+WORKDIR /app/apps/web
+CMD ["next", "start", "-p", "3000"]
