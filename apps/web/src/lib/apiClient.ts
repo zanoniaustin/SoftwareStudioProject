@@ -11,13 +11,37 @@ export const login = async (credentials: {
 }): Promise<User> => {
     console.log('API Call: Logging in with:', credentials);
 
-    const users = JSON.parse(localStorage.getItem('users')) || {};
-
-    if (users[credentials.email] && users[credentials.email].password == credentials.password) {
-        return {id: 'user123', username: users[credentials.email].username, email: credentials.email};
+    // The URL of your Next.js API route
+    const loginApiUrl = '/api/login';
+  
+    try {
+      // Create a FormData object to send the credentials
+      const formData = new FormData();
+      formData.append('email', credentials.email);
+      if (credentials.password) {
+        formData.append('password', credentials.password);
+      }
+  
+      const response = await fetch(loginApiUrl, {
+        method: 'POST',
+        body: formData,
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Login Failed');
+      }
+  
+      // Assuming the backend returns the user data on successful login
+      const user: User = await response.json();
+      return user;
+  
+    } catch (error) {
+      console.error('Login error:', error);
+      // Log the specific URL that failed to help with debugging
+      console.error('Failed to make API call to:', loginApiUrl);
+      throw new Error('Login Failed: Could not connect to the authentication service.');
     }
-
-    throw new Error('Login Failed: Invalid Email/Password');
 };
 
 export const register = async (userInfo: {
