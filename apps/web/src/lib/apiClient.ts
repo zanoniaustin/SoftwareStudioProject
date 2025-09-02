@@ -7,7 +7,7 @@ const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 // --- Auth API ---
 export const login = async (credentials: {
     email: string;
-    password?: string;
+    password: string;
 }): Promise<User> => {
     console.log('API Call: Logging in with:', credentials);
 
@@ -15,52 +15,80 @@ export const login = async (credentials: {
     const loginApiUrl = '/api/login';
   
     try {
-      // Create a FormData object to send the credentials
-      const formData = new FormData();
-      formData.append('email', credentials.email);
-      if (credentials.password) {
-        formData.append('password', credentials.password);
-      }
+        // Create a FormData object to send the credentials
+        const formData = new FormData();
+        formData.append('input_email', credentials.email);
+            formData.append('input_password', credentials.password);
+    
+        const response = await fetch(loginApiUrl, {
+            method: 'POST',
+            body: formData,
+        });
+    
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Login Failed');
+        }
   
-      const response = await fetch(loginApiUrl, {
-        method: 'POST',
-        body: formData,
-      });
-  
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Login Failed');
-      }
-  
-      // Assuming the backend returns the user data on successful login
-      const user: User = await response.json();
-      return user;
+        // Assuming the backend returns the user data on successful login
+        const backend_response = await response.json();
+
+        if ('error' in backend_response) {
+            throw new Error(backend_response.error);
+        }
+
+        const user: User = backend_response
+        return user;
   
     } catch (error) {
-      console.error('Login error:', error);
-      // Log the specific URL that failed to help with debugging
-      console.error('Failed to make API call to:', loginApiUrl);
-      throw new Error('Login Failed: Could not connect to the authentication service.');
+        console.error('Login error:', error);
+        // Log the specific URL that failed to help with debugging
+        console.error('Failed to make API call to:', loginApiUrl);
+        throw new Error('Login Failed: Could not connect to the authentication service.');
     }
 };
 
 export const register = async (userInfo: {
     username: string;
     email: string;
-    password?: string;
+    password: string;
 }): Promise<User> => {
-    console.log('API Call: Registering user:', userInfo);
+    // The URL of your Next.js API route
+    const registerApiUrl = '/api/register';
+  
+    try {
+        // Create a FormData object to send the credentials
+        const formData = new FormData();
+        formData.append('input_username', userInfo.username);
+        formData.append('input_email', userInfo.email);
+        formData.append('input_password', userInfo.password);
+    
+        const response = await fetch(registerApiUrl, {
+            method: 'POST',
+            body: formData,
+        });
+    
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Register Failed');
+        }
+  
+        // Assuming the backend returns the user data on successful login
+        const backend_response = await response.json();
 
-    const users = JSON.parse(localStorage.getItem('users')) || {};
+        if ('error' in backend_response) {
+            throw new Error(backend_response.error);
+        }
 
-    if (users[userInfo.email]) {
-        throw new Error('Username already exists. Please choose a new username.');
+        const user: User = backend_response
+        return user;
+  
+    } catch (error) {
+        console.error('Register error:', error);
+        // Log the specific URL that failed to help with debugging
+        console.error('Failed to make API call to:', registerApiUrl);
+        throw new Error('Register Failed: Could not connect to the authentication service.');
     }
-
-    users[userInfo.email] = {username: userInfo.username, password: userInfo.password};
-    localStorage.setItem('users', JSON.stringify(users));
-
-    return {id: 'user123', username: userInfo.username, email: userInfo.email};
 };
 
 export const logout = async (): Promise<{ success: true }> => {

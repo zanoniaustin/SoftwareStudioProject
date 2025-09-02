@@ -254,8 +254,9 @@ def register_api(input_username: Annotated[str, Form()],
 
     print("Creating user with email: " + email)
     formatted_results.append({
-      "username": username,
-      "email": email
+        "id": "123",
+        "username": username,
+        "email": email
     })
     
   return JSONResponse(content=formatted_results)
@@ -268,11 +269,11 @@ def login_api(input_email: Annotated[str, Form()],
 
   with open('output.txt', 'r') as file:
     for line in file:
-      email, username, password = line.strip().split()
-      users_dict[email] = {
-          "username": username,
-          "password": password
-      }
+        email, username, password = line.strip().split()
+        users_dict[email] = {
+            "username": username,
+            "password": password
+        }
   
   if input_email in users_dict.keys():
     hashed_password = users_dict[input_email]["password"]
@@ -280,6 +281,7 @@ def login_api(input_email: Annotated[str, Form()],
     if bcrypt.checkpw(input_password.encode('utf-8'), hashed_password.encode('utf-8')):
       print("Login successful")
       formatted_results.append({
+        "id": "123",
         "username": username,
         "email": email
       })
