@@ -13,10 +13,11 @@ import torch
 import torch.nn as nn
 from PIL import Image
 from bs4 import BeautifulSoup
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from torchvision import models, transforms
+from typing import Annotated
 
 app = FastAPI()
 
@@ -218,3 +219,9 @@ async def search_cards_api(query: str = ""):
 
     except Exception as e:
         return JSONResponse(content={"error": f"Server error: {str(e)}"}, status_code=500)
+
+@app.post("regsiter")
+async def register_api(username: Annotated[str, Form()],
+                    email: Annotated[str, Form()],
+                    password: Annotated[str, Form()]):
+    print("Resgister")
