@@ -10,6 +10,7 @@ import pandas as pd
 import pytesseract
 import requests
 import torch
+import bcrypt
 import torch.nn as nn
 from PIL import Image
 from bs4 import BeautifulSoup
@@ -224,4 +225,33 @@ async def search_cards_api(query: str = ""):
 async def register_api(username: Annotated[str, Form()],
                     email: Annotated[str, Form()],
                     password: Annotated[str, Form()]):
-    print("Resgister")
+  users_dict = {}
+  with open('output.txt', 'r') as file:
+    for line in file:
+      email, username, password = line.strip().split()
+      users_dict[email] = {
+          "username": username,
+          "password": password
+      }
+  
+  byte_password = password.encode('utf-8')
+  hashed_password = bcrypt.hashpw(byte_password, bcrypt.gensalt())
+  
+  if email in users_dict.keys():
+    print("Email already exists")
+  else:
+    with open('output.txt', 'a') as file:
+      file.write(email)
+      file.write(" ")
+      file.write(username)
+      file.write(" ")
+      file.write(hashed_password.decode('utf-8'))
+      file.write("\n")
+  print("Creating user with email: " + email)
+                      
+  formatted_results.append({
+    "username": username,
+    "email": email
+  })
+
+  return JSONResponse(content=formatted_results)
