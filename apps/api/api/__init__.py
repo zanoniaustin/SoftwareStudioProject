@@ -221,11 +221,13 @@ async def search_cards_api(query: str = ""):
     except Exception as e:
         return JSONResponse(content={"error": f"Server error: {str(e)}"}, status_code=500)
 
-@app.post("regsiter")
-async def register_api(username: Annotated[str, Form()],
-                    email: Annotated[str, Form()],
-                    password: Annotated[str, Form()]):
+@app.post("/regsiter")
+def register_api(input_username: Annotated[str, Form()],
+                    input_email: Annotated[str, Form()],
+                    input_password: Annotated[str, Form()]):
+
   users_dict = {}
+  formatted_results = []
   with open('output.txt', 'r') as file:
     for line in file:
       email, username, password = line.strip().split()
@@ -234,24 +236,62 @@ async def register_api(username: Annotated[str, Form()],
           "password": password
       }
   
-  byte_password = password.encode('utf-8')
-  hashed_password = bcrypt.hashpw(byte_password, bcrypt.gensalt())
+  hashed_password = bcrypt.hashpw(input_password.encode('utf-8'), bcrypt.gensalt())
   
-  if email in users_dict.keys():
+  if input_email in users_dict.keys():
     print("Email already exists")
+    formatted_results.append({
+      "error": "Email already exists"
+    })
   else:
     with open('output.txt', 'a') as file:
-      file.write(email)
+      file.write(input_email)
       file.write(" ")
-      file.write(username)
+      file.write(input_username)
       file.write(" ")
       file.write(hashed_password.decode('utf-8'))
       file.write("\n")
-  print("Creating user with email: " + email)
-                      
-  formatted_results.append({
-    "username": username,
-    "email": email
-  })
+
+    print("Creating user with email: " + email)
+    formatted_results.append({
+      "username": username,
+      "email": email
+    })
+    
+  return JSONResponse(content=formatted_results)
+
+@app.post("/login")
+def login_api(input_email: Annotated[str, Form()],
+                    input_password: Annotated[str, Form()]):
+  users_dict = {}
+  formatted_results = []
+
+  with open('output.txt', 'r') as file:
+    for line in file:
+      email, username, password = line.strip().split()
+      users_dict[email] = {
+          "username": username,
+          "password": password
+      }
+  
+  if input_email in users_dict.keys():
+    hashed_password = users_dict[input_email]["password"]
+  
+    if bcrypt.checkpw(input_password.encode('utf-8'), hashed_password.encode('utf-8')):
+      print("Login successful")
+      formatted_results.append({
+        "username": username,
+        "email": email
+      })
+    else:
+      print("Incorrect password")
+      formatted_results.append({
+        "error": "Incorrect password"
+      })
+  else:
+    print("User not found")
+    formatted_results.append({
+      "error": "User not found"
+    })
 
   return JSONResponse(content=formatted_results)
