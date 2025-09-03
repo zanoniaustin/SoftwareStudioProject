@@ -5,3 +5,10 @@ dist
 .ipynb_checkpoints
 .vscode
 images
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+.git/
+*.log

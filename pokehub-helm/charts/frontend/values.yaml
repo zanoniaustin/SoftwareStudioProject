@@ -1,7 +1,13 @@
 image:
-  repository: pokehub-frontend
-  tag: latest
+  repository: docker.io/jhyang/pokehub-frontend
+  tag: 0.0.2
 
 ingress:
   enabled: false
   host: pokehub.local
+
+
+healthCheck:
+  enabled: true
+  path: /healthz      # what your app returns 200 on
+  port: 3000          # Service port (or the HTTP port you want probed)

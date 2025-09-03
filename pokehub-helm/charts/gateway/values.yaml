@@ -1,0 +1,12 @@
+namespace: pokehub
+host: pokehub.just-incredible.dev
+tls:
+  preSharedCert: pokehub-justincredible-cert  # or leave empty if doing HTTP first
+routes:
+  - path: /
+    service: pokehub-frontend
+    port: 3000
+  - path: /api
+    service: pokehub-backend
+    port: 8000
+gatewayClassName: gke-l7-global-external-managed

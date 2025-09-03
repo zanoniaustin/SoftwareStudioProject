@@ -13,10 +13,10 @@ HELM_CHART=./pokehub-helm
 build: build-frontend build-backend
 
 build-frontend:
-	docker build -t $(FRONTEND_IMAGE):latest -f $(FRONTEND_DOCKERFILE) .
+	docker buildx build --platform linux/amd64 -t $(FRONTEND_IMAGE):latest -f $(FRONTEND_DOCKERFILE) .
 
 build-backend:
-	docker build -t $(BACKEND_IMAGE):latest -f $(BACKEND_DOCKERFILE) .
+	docker buildx build --platform linux/amd64 -t $(BACKEND_IMAGE):latest -f $(BACKEND_DOCKERFILE) .
 
 # Load images into kind cluster
 kind-load:

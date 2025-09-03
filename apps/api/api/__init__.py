@@ -293,3 +293,7 @@ def login_api(input_email: Annotated[str, Form()],
     else:
         # User not found, return 404 Not Found
         return JSONResponse(content={"error": "User not found"}, status_code=404)
+
+@app.get("/healthz")
+async def health_check():
+    return {"status": "ok", "message": "Service is healthy"}
