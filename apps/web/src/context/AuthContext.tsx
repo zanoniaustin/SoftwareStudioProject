@@ -35,7 +35,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
 
   const handleLogin = async (credentials: {
     email: string;
-    password?: string;
+    password: string;
   }) => {
     try {
       const userData = await apiClient.login(credentials);
@@ -51,7 +51,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const handleRegister = async (userInfo: {
     username: string;
     email: string;
-    password?: string;
+    password: string;
   }) => {
     try {
       const userData = await apiClient.register(userInfo);

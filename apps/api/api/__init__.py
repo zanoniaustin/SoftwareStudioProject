@@ -3,17 +3,19 @@ import io
 import json
 import os
 import re
-import time
+from typing import Annotated
 
+import bcrypt
 import cv2
 import pandas as pd
 import pytesseract
 import requests
+import time
 import torch
 import torch.nn as nn
 from PIL import Image
 from bs4 import BeautifulSoup
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from torchvision import models, transforms
@@ -187,6 +189,7 @@ async def identify_card_api(file: UploadFile = File(...)):
     except Exception as e:
         return JSONResponse(content={"error": f"Server error: {str(e)}"}, status_code=500)
 
+
 @app.post("/search_cards")
 async def search_cards_api(query: str = ""):
     try:
@@ -199,7 +202,7 @@ async def search_cards_api(query: str = ""):
 
         formatted_results = []
         for card in results:
-            price = "N/A" # No price column in CSV, so we use a placeholder.
+            price = "N/A"  # No price column in CSV, so we use a placeholder.
 
             formatted_results.append({
                 "id": card.get("id", ""),
@@ -207,10 +210,10 @@ async def search_cards_api(query: str = ""):
                 # Correctly format 'set' as an object to match frontend type
                 "set": {
                     "name": card.get("set", ""),
-                    "number": "" # CSV does not contain a card number, so this is empty
+                    "number": ""  # CSV does not contain a card number, so this is empty
                 },
                 "rarity": card.get("rarity", ""),
-                "base64_image": card.get("base64_image", ""), # Use base64 from CSV
+                "base64_image": card.get("base64_image", ""),  # Use base64 from CSV
                 "price": price
             })
 
@@ -218,3 +221,75 @@ async def search_cards_api(query: str = ""):
 
     except Exception as e:
         return JSONResponse(content={"error": f"Server error: {str(e)}"}, status_code=500)
+
+
+@app.post("/register")
+def register_api(input_username: Annotated[str, Form()],
+                 input_email: Annotated[str, Form()],
+                 input_password: Annotated[str, Form()]):
+    users_dict = {}
+    # Use a try-except block in case the file doesn't exist yet
+    try:
+        with open('output.txt', 'r') as file:
+            for line in file:
+                email, username, password = line.strip().split()
+                users_dict[email] = {
+                    "username": username,
+                    "password": password
+                }
+    except FileNotFoundError:
+        pass  # It's okay if the file doesn't exist on the first run
+
+    if input_email in users_dict:
+        # Return a single error object with a 409 Conflict status code
+        return JSONResponse(content={"error": "Email already exists"}, status_code=409)
+
+    hashed_password = bcrypt.hashpw(input_password.encode('utf-8'), bcrypt.gensalt())
+
+    with open('output.txt', 'a') as file:
+        file.write(f"{input_email} {input_username} {hashed_password.decode('utf-8')}\n")
+
+    # Return a single user object with the CORRECT user data
+    # Use a placeholder ID for now
+    new_user = {
+        "id": "user_" + str(len(users_dict) + 1),
+        "username": input_username,
+        "email": input_email
+    }
+    return JSONResponse(content=new_user, status_code=201)
+
+
+@app.post("/login")
+def login_api(input_email: Annotated[str, Form()],
+              input_password: Annotated[str, Form()]):
+    users_dict = {}
+    try:
+        with open('output.txt', 'r') as file:
+            for line in file:
+                email, username, password = line.strip().split()
+                users_dict[email] = {
+                    "username": username,
+                    "password": password
+                }
+    except FileNotFoundError:
+        # If file doesn't exist, no users can log in
+        return JSONResponse(content={"error": "User not found"}, status_code=404)
+
+    if input_email in users_dict:
+        stored_user = users_dict[input_email]
+        hashed_password = stored_user["password"]
+
+        if bcrypt.checkpw(input_password.encode('utf-8'), hashed_password.encode('utf-8')):
+            # Login successful, return a single object with the CORRECT user's data
+            user_data = {
+                "id": "user_" + str(list(users_dict.keys()).index(input_email) + 1),  # Placeholder ID
+                "username": stored_user["username"],
+                "email": input_email
+            }
+            return JSONResponse(content=user_data)
+        else:
+            # Incorrect password, return 401 Unauthorized
+            return JSONResponse(content={"error": "Incorrect password"}, status_code=401)
+    else:
+        # User not found, return 404 Not Found
+        return JSONResponse(content={"error": "User not found"}, status_code=404)
