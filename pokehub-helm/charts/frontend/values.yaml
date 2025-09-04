@@ -1,13 +1,20 @@
 image:
   repository: docker.io/jhyang/pokehub-frontend
-  tag: 0.0.2
+  tag: "0.0.9"
 
-ingress:
-  enabled: false
-  host: pokehub.local
+service:
+  port: 3000        # exposed Service port
+  targetPort: 3000  # container's actual listening port
 
-
-healthCheck:
+probes:
   enabled: true
-  path: /healthz      # what your app returns 200 on
-  port: 3000          # Service port (or the HTTP port you want probed)
+  # Many SPAs return 200 at "/". If you add a dedicated endpoint in your Node app,
+  # switch this to /healthz and keep Service.targetPort aligned.
+  path: /
+  initialDelaySeconds: 2
+  periodSeconds: 5
+  livenessInitialDelaySeconds: 10
+  livenessPeriodSeconds: 10
+
+env:
+  NEXT_PUBLIC_API_BASE_URL: "https://api.pokehub.just-incredible.dev"

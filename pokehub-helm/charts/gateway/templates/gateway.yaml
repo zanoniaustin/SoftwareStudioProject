@@ -1,15 +1,19 @@
-apiVersion: gateway.networking.k8s.io/v1beta1
+apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
-  name: pokehub-gateway
+  name: {{ .Values.gatewayName }}
   namespace: {{ .Values.namespace }}
 spec:
   gatewayClassName: {{ .Values.gatewayClassName }}
   listeners:
-    - name: https
-      protocol: HTTPS
-      port: 443
-      tls:
-        mode: Terminate
-        options:
-          networking.gke.io/pre-shared-certs: {{ .Values.tls.preSharedCert | quote }}
+  - name: https
+    protocol: HTTPS
+    port: 443
+    tls:
+      mode: Terminate
+      {{- with .Values.tls }}
+      {{- if .preSharedCert }}
+      options:
+        networking.gke.io/pre-shared-certs: {{ .preSharedCert | quote }}
+      {{- end }}
+      {{- end }}

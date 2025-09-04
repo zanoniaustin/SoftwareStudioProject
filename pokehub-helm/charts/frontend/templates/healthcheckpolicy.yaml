@@ -1,18 +1,16 @@
-{{- if and .Values.healthCheck.enabled (.Capabilities.APIVersions.Has "networking.gke.io/v1/HealthCheckPolicy") }}
+{{- if .Capabilities.APIVersions.Has "networking.gke.io/v1/HealthCheckPolicy" }}
 apiVersion: networking.gke.io/v1
 kind: HealthCheckPolicy
 metadata:
   name: {{ include "frontend.fullname" . }}-hc
   namespace: {{ .Release.Namespace }}
-  labels:
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
 spec:
   default:
     config:
       type: HTTP
       httpHealthCheck:
-        port: {{ .Values.healthCheck.port }}
-        requestPath: {{ .Values.healthCheck.path | quote }}
+        port: {{ .Values.service.targetPort }}
+        requestPath: {{ .Values.probes.path | quote }}
   targetRef:
     group: ""
     kind: Service

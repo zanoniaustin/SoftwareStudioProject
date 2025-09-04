@@ -20,11 +20,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from torchvision import models, transforms
 
-app = FastAPI()
+app = FastAPI(root_path="/api")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=[
+        "http://localhost:3000",
+        "https://pokehub.just-incredible.dev",
+        "https://api.pokehub.just-incredible.dev"
+                   ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
