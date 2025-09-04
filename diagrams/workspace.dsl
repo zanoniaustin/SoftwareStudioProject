@@ -7,6 +7,9 @@ workspace "PokéHub" "C4 model for a Pokémon card identifier with Next.js front
         admin = person "Admin"    "Curates the dataset and monitors the system."
 
         // Software System
+
+        ebay = softwareSystem "eBay" "External website/API to fetch current market prices of identified card."
+
         system = softwareSystem "PokéHub" "Identifies Pokémon cards from images and shows card details." {
 
             // Containers
@@ -20,8 +23,6 @@ workspace "PokéHub" "C4 model for a Pokémon card identifier with Next.js front
             frontend -> ebay "Grabs latest market prices and information on cards."
         }
 
-        ebay = softwareSystem "External-APIs" "Fetches current market prices."
-
         // Deployment: Production
         deploymentEnvironment "Production" {
             gcp = deploymentNode "Google Cloud Project" "GCP project hosting GKE and load balancer" "GCP" {
@@ -30,7 +31,7 @@ workspace "PokéHub" "C4 model for a Pokémon card identifier with Next.js front
                 dockerhub = infrastructureNode "Docker Hub Registry" "Container images for frontend and backend" "Registry"
 
                 gke = deploymentNode "GKE Cluster" "Managed Kubernetes" "GKE" {
-                    ns_app = deploymentNode "Namespace: app" "Application namespace" "Kubernetes Namespace" {
+                    ns_app = deploymentNode "Namespace: pokehub" "Application namespace" "Kubernetes Namespace" {
                         gateway     = infrastructureNode "Gateway API" "Gateway + Controller (L7 entry)" "Gateway API"
                         route_front = infrastructureNode "HTTPRoute: pokehub.just-incredible.dev" "Routes host to Frontend Service" "Gateway API"
                         route_api   = infrastructureNode "HTTPRoute: api.pokehub.just-incredible.dev" "Routes host to Backend Service" "Gateway API"
