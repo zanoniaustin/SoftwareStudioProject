@@ -1,6 +1,6 @@
 image:
   repository: docker.io/jhyang/pokehub-frontend
-  tag: "0.0.9"
+  tag: "0.0.10"
 
 service:
   port: 3000        # exposed Service port
