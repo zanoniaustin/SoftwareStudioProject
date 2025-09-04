@@ -13,23 +13,23 @@ export const login = async (credentials: {
 
     // The URL of your Next.js API route
     const loginApiUrl = '/api/login';
-  
+
     try {
         // Create a FormData object to send the credentials
         const formData = new FormData();
         formData.append('input_email', credentials.email);
-            formData.append('input_password', credentials.password);
-    
+        formData.append('input_password', credentials.password);
+
         const response = await fetch(loginApiUrl, {
             method: 'POST',
             body: formData,
         });
-    
+
         if (!response.ok) {
             const errorData = await response.json();
             throw new Error(errorData.error || 'Login Failed');
         }
-  
+
         // Assuming the backend returns the user data on successful login
         const backend_response = await response.json();
 
@@ -39,7 +39,7 @@ export const login = async (credentials: {
 
         const user: User = backend_response
         return user;
-  
+
     } catch (error) {
         console.error('Login error:', error);
         // Log the specific URL that failed to help with debugging
@@ -55,24 +55,24 @@ export const register = async (userInfo: {
 }): Promise<User> => {
     // The URL of your Next.js API route
     const registerApiUrl = '/api/register';
-  
+
     try {
         // Create a FormData object to send the credentials
         const formData = new FormData();
         formData.append('input_username', userInfo.username);
         formData.append('input_email', userInfo.email);
         formData.append('input_password', userInfo.password);
-    
+
         const response = await fetch(registerApiUrl, {
             method: 'POST',
             body: formData,
         });
-    
+
         if (!response.ok) {
             const errorData = await response.json();
             throw new Error(errorData.error || 'Register Failed');
         }
-  
+
         // Assuming the backend returns the user data on successful login
         const backend_response = await response.json();
 
@@ -82,7 +82,7 @@ export const register = async (userInfo: {
 
         const user: User = backend_response
         return user;
-  
+
     } catch (error) {
         console.error('Register error:', error);
         // Log the specific URL that failed to help with debugging
@@ -125,6 +125,7 @@ export const identifyCard = async (imageFile: File): Promise<PokemonCard> => {
         },
         rarity: data.rarity,
         imageUrl: data.official_card_image_url,
+        base64Image: data.base64_image,
         estimatedPrice: data.price, // This is the EST price from main.py
     };
 };
