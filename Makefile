@@ -6,6 +6,7 @@ BACKEND_DOCKERFILE=Dockerfile.backend
 KIND_CLUSTER_NAME=software-studio
 HELM_RELEASE=pokehub
 HELM_CHART=./pokehub-helm
+VERSION=0.0.5
 
 # ==== Targets ====
 
@@ -13,10 +14,16 @@ HELM_CHART=./pokehub-helm
 build: build-frontend build-backend
 
 build-frontend:
-	docker build -t $(FRONTEND_IMAGE):latest -f $(FRONTEND_DOCKERFILE) .
+	docker buildx build --platform linux/amd64 -t $(FRONTEND_IMAGE):latest -f $(FRONTEND_DOCKERFILE) .
 
 build-backend:
-	docker build -t $(BACKEND_IMAGE):latest -f $(BACKEND_DOCKERFILE) .
+	docker buildx build --platform linux/amd64 -t $(BACKEND_IMAGE):latest -f $(BACKEND_DOCKERFILE) .
+
+tag-push:
+	docker tag $(FRONTEND_IMAGE):latest jhyang/$(FRONTEND_IMAGE):$(VERSION)
+	docker tag $(BACKEND_IMAGE):latest jhyang/$(BACKEND_IMAGE):$(VERSION)
+	docker push jhyang/$(FRONTEND_IMAGE):$(VERSION)
+	docker push jhyang/$(BACKEND_IMAGE):$(VERSION)
 
 # Load images into kind cluster
 kind-load:

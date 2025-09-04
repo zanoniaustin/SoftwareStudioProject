@@ -1,3 +1,15 @@
 image:
-  repository: pokehub-backend
-  tag: latest
+  repository: docker.io/jhyang/pokehub-backend
+  tag: "0.0.5"
+
+service:
+  port: 8000        # exposed Service port
+  targetPort: 8000  # container's actual listening port (FastAPI default if you start uvicorn on 8000)
+
+probes:
+  enabled: true
+  path: /healthz    # your FastAPI health endpoint
+  initialDelaySeconds: 2
+  periodSeconds: 5
+  livenessInitialDelaySeconds: 10
+  livenessPeriodSeconds: 10

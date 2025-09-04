@@ -20,11 +20,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from torchvision import models, transforms
 
-app = FastAPI()
+app = FastAPI(root_path="/api")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=[
+        "http://localhost:3000",
+        "https://pokehub.just-incredible.dev",
+        "https://api.pokehub.just-incredible.dev"
+                   ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -293,3 +297,7 @@ def login_api(input_email: Annotated[str, Form()],
     else:
         # User not found, return 404 Not Found
         return JSONResponse(content={"error": "User not found"}, status_code=404)
+
+@app.get("/healthz")
+async def health_check():
+    return {"status": "ok", "message": "Service is healthy"}

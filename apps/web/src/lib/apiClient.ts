@@ -1,6 +1,12 @@
 // src/lib/apiClient.ts
-import {CollectionItem, PokemonCard, User} from '../types';
+import { CollectionItem, PokemonCard, User } from "../types";
 import {MOCK_USER_COLLECTION} from './mockData';
+
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  "https://api.pokehub.just-incredible.dev";
+
+console.log("API_BASE:", API_BASE);
 
 const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
@@ -11,41 +17,20 @@ export const login = async (credentials: {
 }): Promise<User> => {
     console.log('API Call: Logging in with:', credentials);
 
-    // The URL of your Next.js API route
-    const loginApiUrl = '/api/login';
+    const url = `${API_BASE}/login`;
+    const formData = new FormData();
+    formData.append('input_email', credentials.email);
+    formData.append('input_password', credentials.password);
 
-    try {
-        // Create a FormData object to send the credentials
-        const formData = new FormData();
-        formData.append('input_email', credentials.email);
-        formData.append('input_password', credentials.password);
-
-        const response = await fetch(loginApiUrl, {
-            method: 'POST',
-            body: formData,
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Login Failed');
-        }
-
-        // Assuming the backend returns the user data on successful login
-        const backend_response = await response.json();
-
-        if ('error' in backend_response) {
-            throw new Error(backend_response.error);
-        }
-
-        const user: User = backend_response
-        return user;
-
-    } catch (error) {
-        console.error('Login error:', error);
-        // Log the specific URL that failed to help with debugging
-        console.error('Failed to make API call to:', loginApiUrl);
-        throw new Error('Login Failed: Could not connect to the authentication service.');
+    const resp = await fetch(url, { method: 'POST', body: formData });
+    if (!resp.ok) {
+        const err = await resp.json().catch(() => ({}));
+        throw new Error(err.error || 'Login failed');
     }
+
+    const data = await resp.json();
+    if ('error' in data) throw new Error(data.error);
+    return data as User;
 };
 
 export const register = async (userInfo: {
@@ -54,41 +39,20 @@ export const register = async (userInfo: {
     password: string;
 }): Promise<User> => {
     // The URL of your Next.js API route
-    const registerApiUrl = '/api/register';
+    const registerApiUrl = `${API_BASE}/register`;
+    const formData = new FormData();
+    formData.append("input_username", userInfo.username);
+    formData.append("input_email", userInfo.email);
+    formData.append("input_password", userInfo.password);
 
-    try {
-        // Create a FormData object to send the credentials
-        const formData = new FormData();
-        formData.append('input_username', userInfo.username);
-        formData.append('input_email', userInfo.email);
-        formData.append('input_password', userInfo.password);
-
-        const response = await fetch(registerApiUrl, {
-            method: 'POST',
-            body: formData,
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Register Failed');
-        }
-
-        // Assuming the backend returns the user data on successful login
-        const backend_response = await response.json();
-
-        if ('error' in backend_response) {
-            throw new Error(backend_response.error);
-        }
-
-        const user: User = backend_response
-        return user;
-
-    } catch (error) {
-        console.error('Register error:', error);
-        // Log the specific URL that failed to help with debugging
-        console.error('Failed to make API call to:', registerApiUrl);
-        throw new Error('Register Failed: Could not connect to the authentication service.');
+    const resp = await fetch(registerApiUrl, { method: 'POST', body: formData });
+    if (!resp.ok) {
+        const err = await resp.json().catch(() => ({}));
+        throw new Error(err.error || 'Register failed could not connect to server');
     }
+    const data = await resp.json();
+    if ('error' in data) throw new Error(data.error);
+    return data as User;
 };
 
 export const logout = async (): Promise<{ success: true }> => {
@@ -100,20 +64,14 @@ export const logout = async (): Promise<{ success: true }> => {
 // --- Card API ---
 export const identifyCard = async (imageFile: File): Promise<PokemonCard> => {
     // Prepare form data
+    const url = `${API_BASE}/identify_card`;
     const formData = new FormData();
     formData.append('file', imageFile);
 
-    // Call the FastAPI backend
-    const response = await fetch('http://localhost:8000/identify_card', {
-        method: 'POST',
-        body: formData,
-    });
+    const resp = await fetch(url, { method: 'POST', body: formData });
+    if (!resp.ok) throw new Error('Failed to identify card');
 
-    if (!response.ok) {
-        throw new Error('Failed to identify card');
-    }
-
-    const data = await response.json();
+    const data = await resp.json();
 
     // Map backend response to your PokemonCard type as needed
     return {
@@ -139,37 +97,21 @@ export const getCollection = async (
     return MOCK_USER_COLLECTION;
 };
 
-export const searchDatabase = async ({
-                                         query,
-                                     }: {
-    query: string;
-}): Promise<PokemonCard[]> => {
-    try {
-        const response = await fetch(`http://localhost:8000/search_cards?query=${encodeURIComponent(query)}`, {
-            method: 'POST',
-        });
+export const searchDatabase = async ({query} : {query: string;}): Promise<PokemonCard[]> => {
+  const url = `${API_BASE}/search_cards?query=${encodeURIComponent(query)}`;
+  const resp = await fetch(url, { method: 'POST' });
 
-        if (!response.ok) {
-            throw new Error('Failed to search for cards');
-        }
+  if (!resp.ok) throw new Error('Failed to search for cards');
 
-        const data = await response.json();
+  const data = await resp.json();
 
-        return data.map((card: any) => ({
-            id: card.id,
-            name: card.name,
-            set: { // The backend now sends this as a nested object
-                name: card.set.name,
-                number: card.set.number,
-            },
-            rarity: card.rarity,
-            imageUrl: '', // Set to empty as we are using the base64 image
-            base64Image: card.base64_image,
-            estimatedPrice: card.price,
-        }));
-
-    } catch (error) {
-        console.error("Error searching database:", error);
-        return [];
-    }
+   return data.map((card: any) => ({
+    id: card.id,
+    name: card.name,
+    set: { name: card.set.name ?? card.set, number: card.set.number ?? "" },
+    rarity: card.rarity,
+    imageUrl: "",
+    base64Image: card.base64_image,
+    estimatedPrice: card.price,
+  }));
 };

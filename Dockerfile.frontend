@@ -11,6 +11,8 @@ RUN npm ci --no-audit --no-fund
 FROM node:20-alpine AS builder
 WORKDIR /app
 ENV NX_DAEMON=false
+ARG NEXT_PUBLIC_API_BASE_URL
+ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npx nx build @pokehub/web
@@ -22,6 +24,9 @@ WORKDIR /app
 ENV NODE_ENV=production
 # Make the root node_modules binaries visible when we cd into apps/web
 ENV PATH=/app/node_modules/.bin:$PATH
+
+ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
+
 
 # Built assets and public
 COPY --from=builder /app/apps/web/.next /app/apps/web/.next

@@ -1,0 +1,18 @@
+{{- if .Capabilities.APIVersions.Has "networking.gke.io/v1/HealthCheckPolicy" }}
+apiVersion: networking.gke.io/v1
+kind: HealthCheckPolicy
+metadata:
+  name: {{ include "backend.fullname" . }}-hc
+  namespace: {{ .Release.Namespace }}
+spec:
+  default:
+    config:
+      type: HTTP
+      httpHealthCheck:
+        port: {{ .Values.service.targetPort }}
+        requestPath: {{ .Values.probes.path | quote }}
+  targetRef:
+    group: ""
+    kind: Service
+    name: {{ include "backend.fullname" . }}
+{{- end }}
