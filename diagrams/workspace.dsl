@@ -17,7 +17,10 @@ workspace "PokéHub" "C4 model for a Pokémon card identifier with Next.js front
             user  -> frontend "Browse/Upload, view results" "HTTPS"
             admin -> frontend "Manage system & content"     "HTTPS"
             frontend -> backend "REST/JSON" "HTTPS"
+            frontend -> ebay "Grabs latest market prices and information on cards."
         }
+
+        ebay = softwareSystem "External-APIs" "Fetches current market prices."
 
         // Deployment: Production
         deploymentEnvironment "Production" {

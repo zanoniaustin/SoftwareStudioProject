@@ -83,6 +83,7 @@ export const identifyCard = async (imageFile: File): Promise<PokemonCard> => {
         },
         rarity: data.rarity,
         imageUrl: data.official_card_image_url,
+        base64Image: data.base64_image,
         estimatedPrice: data.price, // This is the EST price from main.py
     };
 };
